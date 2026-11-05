@@ -18,6 +18,8 @@ jobs:
   build-publish-pdf:
 
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
 
     steps:
 
