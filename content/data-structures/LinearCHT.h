@@ -16,9 +16,9 @@ template<class T>
 struct Line {
     T m, b;
     Line(T m, T b) : m(m), b(b) {}
-    T isect(const Line<T>& o) {
-        return (o.b-b) / (m-o.m);
-    }
+    T isect(const Line<T>& o) { return div(o.b-b, m-o.m); }
+	static T div(ll a, ll b) { // floored division
+		return a / b - ((a ^ b) < 0 && a % b); }
 };
 
 template<class T>
@@ -26,13 +26,13 @@ struct CHT {
     deque<Line<T>> q;
     void insert(T m, T b) {
         Line<T> v(m, b);
-        while (sz(q) > 1 && v.isect(q[0]) <= q[0].isect(q[1])) 
+        while (sz(q) > 1 && v.isect(q[0]) <= q[0].isect(q[1]))
             q.pop_front();
         q.push_front(v);
     }
     T query(T x) {
         int s = sz(q)-1;
-        while (s > 0 && q[s].isect(q[--s]) < x) 
+        while (s > 0 && q[s].isect(q[--s]) < x)
             q.pop_back();
         auto [m, b] = q.back();
         return m * x + b;

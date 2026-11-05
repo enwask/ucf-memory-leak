@@ -31,14 +31,14 @@ template<class T> struct Basis {
 		return true;
 	}
 	vector<T> get(B v) const {
-		if (v.none()) return {{}};
+		if (v.none()) return {};
 		B w;
-		for (int i = 0; i < M; i++)
+		for (int i = M-1; i >= 0; i--)
 			if (v[i]) v ^= basis[i], w ^= which[i];
 		if (v.any()) return {};
 
 		vector<T> res;
-		for (int i = 0; i < M; i++)
+		for (int i = M-1; i >= 0; i--)
 			if (w[i]) res.push_back(val[i]);
 		return res;
 	}
