@@ -3,13 +3,14 @@
  * Date: 2025-01-25
  * License: CC0
  * Source: me
- * Description: Maximum r such that g(prod(l, r)). Goes in LazySegmentTree.
+ * Description: Maximum r such that g(query(l, r)). Goes in LazySegmentTree.
  * Time: O(\log N).
  */
 #pragma once
 
 int max_right(int l, auto g) {
 	assert(g(ego()));
+	if (l == n) return n;
 	l += size;
 	dip push(l >> i);
 	S sm = ego();

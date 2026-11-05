@@ -3,13 +3,14 @@
  * Date: 2025-01-25
  * License: CC0
  * Source: me
- * Description: Minimum l such that g(prod(l, r)). Goes in LazySegmentTree.
+ * Description: Minimum l such that g(query(l, r)). Goes in LazySegmentTree.
  * Time: O(\log N).
  */
 #pragma once
 
 int min_left(int r, auto g) {
 	assert(g(ego()));
+	if (!r) return 0;
 	r += size;
 	dip push((r - 1) >> i);
 	S sm = ego();
