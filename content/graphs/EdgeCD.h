@@ -4,7 +4,8 @@
  * Source: https://github.com/programming-team-code/programming_team_code/
  * Description: Recursively splits a tree into two edge sets that share a centroid.
  * Consider all paths that pass through the centroid and use at least one edge from
- * each set. A node can be a centroid multiple times. Consider all length 1 paths separately.
+ * each set. A node can be a centroid multiple times. Consider all length 1 paths separately;
+ * don't consider root to node paths in F.
  * Callback takes the graph, centroid, and split, where edges $[0, split)$ from $adj[centroid]$
  * are in the first set and the rest are in the second set.
  * Usage: edge_cd(adj, [\&](const vector<vector<int>>\& adj, int cent, int split) { \ldots\ });
@@ -17,7 +18,7 @@ template <class F> struct edge_cd {
 	vvi adj;
 	F f;
 	vi sub_sz;
-	edge_cd(const vvi& adj, F f) : adj(adj), f(f), 
+	edge_cd(const vvi& adj, F f) : adj(adj), f(f),
 		sub_sz(sz(adj)) {
 		dfs(0, sz(adj) - 1);
 	}
@@ -28,7 +29,7 @@ template <class F> struct edge_cd {
 			if (cent != -1) return cent;
 			sub_sz[u] += sub_sz[v];
 		}
-		return 2 * sub_sz[u] > siz ? 
+		return 2 * sub_sz[u] > siz ?
 			p >= 0 && (sub_sz[p] = siz + 1 - sub_sz[u]), u : -1;
 	}
 	void dfs(int u, int siz) {

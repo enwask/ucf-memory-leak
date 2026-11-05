@@ -3,7 +3,7 @@
  * Date: 2017-04-17
  * License: CC0
  * Source: folklore
- * Description: Finds all biconnected components in an undirected graph, and
+ * Description: Finds all 2-vertex CCs in an undirected graph, and
  *  runs a callback for the edges in each. In a biconnected component there
  *  are at least two distinct paths between any two nodes. Note that a node can
  *  be in several components. An edge which is not in a component is a bridge,
