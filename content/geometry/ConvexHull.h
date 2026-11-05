@@ -20,7 +20,7 @@ Be careful of duplicate points when working with degenerate hulls.
 #include "Point.h"
 
 template<class P> vector<P> convex_hull(vector<P> pts){
-	if(sz(pts) == 1) return pts;
+	if(sz(pts) <= 1) return pts;
 	stable_sort(all(pts));
 	vector<P> hull(sz(pts)+1);
 	int k = 0, t = 2;
