@@ -4,7 +4,7 @@
  * License: CC0
  * Source: me
  * Description: S: base datatype.
- * S op(S, S): merge S.
+ * S op(S, S): commutative, merge S.
  * S ego(): default S, identity for op. F: lazy prop type.
  * S mapping(F, s): apply F to S.
  * F composition(F, F): merge F.
@@ -45,7 +45,7 @@ struct Tree {
 		d[p] = x;
 		tip update(p >> i);
 	}
-	S prod(int l, int r) {
+	S query(int l, int r) {
 		l += size; r += size;
 		dip check(push);
 		S sml = ego(); S smr = ego();
