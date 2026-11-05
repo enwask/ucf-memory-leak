@@ -33,8 +33,9 @@ struct PQUpdate {
 			extra.push_back(--curr);
 			min_ind = min(min_ind, curr->second);
 		} while (2*sz(extra) < sz(st) - min_ind);
+		for (auto it : extra) it->second = -1; // prevent dropping updates
 		while (sz(st) > min_ind) {
-			if (rev_upd.value_comp()(*st.back(), *curr))
+			if (st.back()->second >= 0)
 				extra.push_back(st.back());
 			inner.pop(); st.pop_back();
 		}
