@@ -1,39 +1,45 @@
 /**
- * Author: Tyler Marks
- * Description: Creates a segment tree style data structure that supports
- * adding a function to the set and query the min value at a given x.
- * For any two added functions, they must intersect at most once.
- * If queries can be floating point, consider line container instead.
- * Time: Both operations are $O(\log N)$.
- * Status: Tested on CSES Monster Game II and various problems
+ * Author: Thomas Meeks
+ * Source: Tyler Marks
+ * Description: min Li-chao tree allows for range add of arbitary functions
+ * such that any two functions only occur atmost once.
+ * Usage: inc-inc, implicit, works with negative indices, O(log(n)) query
+ * flip signs in update and modify query to change to max.
  */
-
-#pragma once
-
-struct line {
-	ll m, b;
-	line(ll m = 0, ll b = LLONG_MAX): m(m), b(b) {}
-	ll operator() (ll x) { return m * x + b; }
+struct F {
+    ll A,B;
+    F(ll A, ll B): A(A), B(B) {}
+    ll operator()(ll x) { return (A*x + B); }
 };
- 
+const F idem = {0,(ll)8e18}; //idempotent, change for max
 struct node {
-	int lo, md, hi;
-	line f;
-	node *left, *right;
-	node(int L, int R): lo(L), md((L+R)>>1), hi(R) {
-		if(lo == hi) return;
-		left = new node(lo, md);
-		right = new node(md+1, hi);
-	}
-	void update(line g) {
-		if(g(md) < f(md)) swap(f, g);
-		if(lo == hi) return;
-		if(f(lo) <= g(lo) && f(hi) <= g(hi)) return;
-		if(f(lo) > g(lo)) left->update(g);
-		else right->update(g);
-	}
-	ll query(ll x) {
-		if(lo == hi) return f(x);
-		return min(f(x), (x <= md ? left : right)->query(x));
-	}
+    int lo, hi, md;
+    F f = idem;
+    node *left = nullptr, *rght = nullptr;
+    node(int lo, int hi): lo(lo), hi(hi), md(lo+(hi-lo)/2) {}
+    void check(){
+        if(left) return;
+        left = new node(lo,md);
+        rght = new node(md+1,hi);
+    }
+    void update(F e) { //flip signs for max
+        if(e(md) < f(md)) swap(e, f);
+        if(lo == hi) return;
+        if(e(lo) > f(lo) && e(hi) > f(hi)) return;
+        check();
+        if(e(lo) < f(lo)) left->update(e);
+        else rght->update(e);
+    }
+    void rangeUpdate(int L, int R, F e) { //[]
+        if(R < lo || hi < L) return;
+        if(L <= lo && hi <= R) return update(e);
+        check();
+        left->rangeUpdate(L, R, e);
+        rght->rangeUpdate(L, R,e);
+    }
+    ll query(int x) { //change to max if needed
+        if(lo == hi) return f(x); check();
+        if(x <= md) return min(f(x), left->query(x));
+        return min(f(x), rght->query(x));
+    }
 };
