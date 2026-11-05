@@ -1,41 +1,27 @@
 /**
- * Author: Lukas Polacek
- * Date: 2009-10-28
- * License: CC0
- * Source: Czech graph algorithms book, by Demel. (Tarjan's algorithm)
- * Description: Finds strongly connected components in a
- * directed graph. If vertices $u, v$ belong to the same component,
- * we can reach $u$ from $v$ and vice versa.
- * Usage: scc(graph, [\&](vi\& v) { ... }) visits all components
- * in reverse topological order. comp[i] holds the component
- * index of a node (a component only has edges to components with
- * lower index). ncomps will contain the number of components.
+ * Author: Luke Videckis
+ * Description: Finds strogly connected components
+ * in a directed graph.
+ * Usage: auto [num_sccs, scc_id] = sccs(adj);
+          scc_id[v] = id, 0<=id<num_sccs
+          for each edge u -> v: scc_id[u] >= scc_id[v]
  * Time: O(E + V)
- * Status: Bruteforce-tested for N <= 5
+ * Status: Tested
  */
-#pragma once
 
-vi tin, comp, z, cont;
-int Time, ncomps;
-template<class G, class F> int dfs(int cur, G& g, F& f) {
-	int low = tin[cur] = ++Time, x; z.push_back(cur);
-	for (auto nxt : g[cur]) if (comp[nxt] < 0)
-		low = min(low, tin[nxt] ?: dfs(nxt,g,f));
-
-	if (low == tin[cur]) {
-		do {
-			x = z.back(); z.pop_back();
-			comp[x] = ncomps;
-			cont.push_back(x);
-		} while (x != cur);
-		f(cont); cont.clear();
-		ncomps++;
-	}
-	return tin[cur] = low;
-}
-template<class G, class F> void scc(G& g, F f) {
-	int n = sz(g);
-	tin.assign(n, 0); comp.assign(n, -1);
-	Time = ncomps = 0;
-	rep(i,0,n) if (comp[i] < 0) dfs(i, g, f);
+auto sccs(const vector<vi>& adj) {
+  int n = sz(adj), num_sccs = 0, q = 0, s = 0;
+  vi scc_id(n, -1), tin(n), st(n);
+  auto dfs = [&](auto&& self, int v) -> int {
+    int low = tin[v] = ++q; st[s++] = v;
+    for (int u : adj[v]) if (scc_id[u] < 0)
+        low = min(low, tin[u] ?: self(self, u));
+    if (tin[v] == low) {
+      while (scc_id[v] < 0) scc_id[st[--s]] = num_sccs;
+      num_sccs++;
+    }
+    return low;
+  };
+  rep(i,0,n) if (!tin[i]) dfs(dfs, i);
+  return pair{num_sccs, scc_id};
 }
