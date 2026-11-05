@@ -44,7 +44,7 @@ vi getDomTree(vvi &adj, int src) {
 		for(int j: child[i]) par[j] = i;
 	}
 
-	vi dom(n);
+	vi dom(n, -1);
 	rep(i, 1, t) {
 		if(idom[i] != sdom[i]) idom[i] = idom[idom[i]];
 		dom[revLabel[i]] = revLabel[idom[i]];
