@@ -69,7 +69,7 @@ def find_start_comment(source, start=None):
 
 def processwithcomments(caption, instream, outstream, listingslang):
     knowncommands = ['Author', 'Date', 'Description', 'Source', 'Time', 'Memory', 'License', 'Status', 'Usage', 'Details']
-    requiredcommands = ['Author', 'Description']
+    requiredcommands = []
     includelist = []
     error = ""
     warning = ""
@@ -153,6 +153,44 @@ def processwithcomments(caption, instream, outstream, listingslang):
         hsh = hsh + ', '
     else:
         hsh = ''
+
+    originalHash = hsh
+
+	#partial hashing
+	##############
+    if listingslang in ['C++','Java']:
+        codeLines = nsource.split("\n")
+        prefix = ""
+        lastLine = 0
+        for i in range(len(codeLines)):
+            prefix+=codeLines[i]
+            prefix+="\n"
+            shouldPartialHash = i - lastLine >= 5
+            if codeLines[i].strip().endswith("}") or codeLines[i].strip().endswith("};"):
+                shouldPartialHash = True
+            if len(codeLines[i]) > 53 or len(codeLines[i]) == 0 or "//" in codeLines[i]:
+                shouldPartialHash = False
+            if shouldPartialHash:
+                p = subprocess.Popen(['sh', 'content/contest/%s.sh' % hash_script], stdin=subprocess.PIPE, stdout=subprocess.PIPE, encoding="utf-8")
+                myhsh, _ = p.communicate(prefix)
+                myhsh = myhsh.split(None, 1)[0]
+                myhsh = myhsh[:6] # only keep first six
+                codeLines[i]+= f' //{myhsh}'
+                lastLine = i
+        nsource = '\n'.join(codeLines)
+    ###############
+
+	#hash entire file again to make sure i didn't fuck anything up
+    if listingslang in ['C++', 'Java']:
+        hash_script = 'hash'
+        p = subprocess.Popen(['sh', 'content/contest/%s.sh' % hash_script], stdin=subprocess.PIPE, stdout=subprocess.PIPE, encoding="utf-8")
+        hsh, _ = p.communicate(nsource)
+        hsh = hsh.split(None, 1)[0]
+        hsh = hsh + ', '
+    else:
+        hsh = ''
+
+    assert(originalHash == hsh)
     # Produce output
     out = []
     if warning:
@@ -222,7 +260,7 @@ def print_header(data, outstream):
         return name if name.startswith('.') else name.split('.')[0]
     output = r"\enspace{}".join(map(adjust, lines[:ind]))
     font_size = 10
-    if header_length > 150:
+    if header_length > 120:
         font_size = 8
     output = r"\hspace{3mm}\textbf{" + output + "}"
     output = "\\fontsize{%d}{%d}" % (font_size, font_size) + output
